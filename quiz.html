@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Traditions Quiz 🌎</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffe0f0, #d8f3ff, #fff0bd);
+    color: #303052;
+    padding: 20px;
+  }
+  .container {
+    max-width: 700px;
+    margin: 20px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 24px;
+    box-shadow: 0 8px 25px #7773;
+  }
+  h1 { text-align: center; color: #7538bd; }
+  .subtitle { text-align: center; }
+  .progress {
+    background: #eee;
+    height: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+  #bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #ff70a6, #8e6cff);
+    transition: width .3s;
+  }
+  .question {
+    background: #f7f3ff;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 18px 0;
+  }
+  .question h3 { margin-top: 0; }
+  .option {
+    display: block;
+    width: 100%;
+    margin: 9px 0;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    background: white;
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .option:hover { background: #fff0f7; border-color: #ff70a6; }
+  .option.selected { background: #e8ddff; border-color: #8e6cff; }
+  button.main {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    background: #7538bd;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+  }
+  #result {
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+    margin-top: 20px;
+  }
+  .small { color: #666; font-size: 13px; text-align: center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🌎 World Traditions Quiz 🎉</h1>
+  <p class="subtitle">English A1 · Choose the correct answer!</p>
+  <p class="subtitle">Choose the best answer for each question.</p>
+
+  <div class="progress"><div id="bar"></div></div>
+  <p id="counter">Question 1 of 10</p>
+  <div id="quiz"></div>
+  <button class="main" id="next" onclick="nextQuestion()">Next ➡️</button>
+  <div id="result"></div>
+  <button class="main" id="restart" onclick="restartQuiz()" hidden>🔄 Try Again</button>
+  <p class="small">Made for English learners 💜</p>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "1. Where is Día de Muertos celebrated?",
+    options: ["Mexico", "China", "The United States"],
+    answer: 0
+  },
+  {
+    q: "2. What do people often make for Día de Muertos?",
+    options: ["Snowmen", "Altars", "Sandcastles"],
+    answer: 1
+  },
+  {
+    q: "3. What is a popular Halloween symbol?",
+    options: ["A pumpkin", "A watermelon", "A pineapple"],
+    answer: 0
+  },
+  {
+    q: "4. What do children often say on Halloween?",
+    options: ["Good morning!", "Trick or treat!", "Happy birthday!"],
+    answer: 1
+  },
+  {
+    q: "5. Which country celebrates Qingming Festival?",
+    options: ["China", "Mexico", "Canada"],
+    answer: 0
+  },
+  {
+    q: "6. What do families do during Qingming Festival?",
+    options: ["Remember their ancestors", "Build snowmen", "Have a costume contest"],
+    answer: 0
+  },
+  {
+    q: "7. Which celebration often uses costumes?",
+    options: ["Halloween", "Qingming Festival only", "None of them"],
+    answer: 0
+  },
+  {
+    q: "8. What do people remember on Día de Muertos?",
+    options: ["Their favorite teachers", "Loved ones who have died", "Famous athletes"],
+    answer: 1
+  },
+  {
+    q: "9. What do these traditions have in common?",
+    options: ["They are all sports", "They connect with remembrance or the dead", "They are all in winter"],
+    answer: 1
+  },
+  {
+    q: "10. Which celebration is strongly associated with orange and black decorations?",
+    options: ["Halloween", "Día de Muertos only", "Qingming Festival"],
+    answer: 0
+  }
+];
+
+let current = 0;
+let answers = Array(questions.length).fill(null);
+
+function renderQuestion() {
+  const item = questions[current];
+  document.getElementById("counter").textContent =
+    `Question ${current + 1} of ${questions.length}`;
+  document.getElementById("bar").style.width =
+    `${(current / questions.length) * 100}%`;
+
+  document.getElementById("quiz").innerHTML = `
+    <div class="question">
+      <h3>${item.q}</h3>
+      ${item.options.map((option, index) => `
+        <button class="option ${answers[current] === index ? "selected" : ""}"
+          onclick="chooseAnswer(${index})">
+          ${String.fromCharCode(65 + index)}. ${option}
+        </button>
+      `).join("")}
+    </div>
+  `;
+
+  document.getElementById("next").textContent =
+    current === questions.length - 1 ? "See My Score ⭐" : "Next ➡️";
+}
+
+function chooseAnswer(index) {
+  answers[current] = index;
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (answers[current] === null) {
+    alert("Please choose an answer first! 😊");
+    return;
+  }
+
+  if (current < questions.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  const score = answers.reduce((total, answer, index) =>
+    total + (answer === questions[index].answer ? 1 : 0), 0);
+
+  document.getElementById("quiz").innerHTML = "";
+  document.getElementById("counter").textContent = "Quiz completed!";
+  document.getElementById("bar").style.width = "100%";
+  document.getElementById("next").hidden = true;
+  document.getElementById("restart").hidden = false;
+
+  let message = score >= 8 ? "Excellent! 🎉" :
+                score >= 6 ? "Good job! 🌟" : "Keep practicing! 💪";
+
+  document.getElementById("result").innerHTML =
+    `${message}<br>You got ${score} out of ${questions.length} correct!`;
+}
+
+function restartQuiz() {
+  current = 0;
+  answers = Array(questions.length).fill(null);
+  document.getElementById("next").hidden = false;
+  document.getElementById("restart").hidden = true;
+  document.getElementById("result").innerHTML = "";
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
