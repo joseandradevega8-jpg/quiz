@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#7538bd">
+  <title>World Traditions Quiz 🌎</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      color-scheme: light;
+      --purple: #7538bd;
+      --purple-dark: #55258f;
+      --pink: #ff70a6;
+      --ink: #303052;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: clamp(12px, 3vw, 28px);
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #ffe0f0, #d8f3ff, #fff0bd);
+      color: var(--ink);
+    }
+    .container {
+      width: min(100%, 720px);
+      margin: 12px auto;
+      padding: clamp(18px, 4vw, 30px);
+      background: #fff;
+      border-radius: 24px;
+      box-shadow: 0 8px 28px #45345b26;
+    }
+    h1 { margin: 0 0 12px; text-align: center; color: var(--purple); line-height: 1.25; }
+    .subtitle { text-align: center; margin: 8px 0; }
+    .progress {
+      width: 100%; height: 12px; margin: 22px 0 10px;
+      background: #eee8f7; border-radius: 999px; overflow: hidden;
+    }
+    #bar {
+      height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--pink), #8e6cff);
+      border-radius: inherit; transition: width .25s ease;
+    }
+    #counter { font-size: .95rem; color: #5c5270; }
+    .question {
+      background: #f7f3ff; border: 1px solid #e8ddff;
+      border-radius: 16px; padding: clamp(14px, 3vw, 20px); margin: 18px 0;
+    }
+    .question h2 { margin: 0 0 16px; font-size: 1.15rem; line-height: 1.45; }
+    .option {
+      display: block; width: 100%; margin: 10px 0; padding: 13px 14px;
+      border: 2px solid #ddd6e8; border-radius: 12px;
+      background: white; color: var(--ink); text-align: left;
+      font-size: 1rem; line-height: 1.4; cursor: pointer;
+      transition: background .15s, border-color .15s, transform .15s;
+    }
+    .option:hover { background: #fff0f7; border-color: var(--pink); }
+    .option:focus-visible, button.main:focus-visible { outline: 3px solid #8e6cff; outline-offset: 3px; }
+    .option.selected { background: #e8ddff; border-color: #8e6cff; font-weight: 700; }
+    .option:active { transform: scale(.995); }
+    button.main {
+      display: block; width: 100%; padding: 15px;
+      border: 0; border-radius: 14px; background: var(--purple);
+      color: white; font-size: 1.05rem; font-weight: 700;
+      cursor: pointer; margin-top: 16px;
+    }
+    button.main:hover { background: var(--purple-dark); }
+    button.main:disabled { opacity: .55; cursor: not-allowed; }
+    #result { text-align: center; font-size: 1.2rem; font-weight: 700; line-height: 1.6; margin-top: 20px; }
+    .small { color: #666; font-size: .82rem; text-align: center; margin-bottom: 0; }
+    [hidden] { display: none !important; }
+    @media (max-width: 420px) {
+      body { padding: 10px; }
+      .container { margin: 4px auto; border-radius: 18px; }
+      h1 { font-size: 1.55rem; }
+      .option { font-size: .96rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>🌎 World Traditions Quiz 🎉</h1>
+    <p class="subtitle">English A1 · Choose the correct answer!</p>
+    <p class="subtitle">Choose the best answer for each question.</p>
+
+    <div class="progress" role="progressbar" aria-label="Quiz progress"
+         aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="progress">
+      <div id="bar"></div>
+    </div>
+    <p id="counter" aria-live="polite">Question 1 of 10</p>
+    <section id="quiz" aria-live="polite"></section>
+    <p id="feedback" class="small" aria-live="polite"></p>
+    <button class="main" id="next" type="button">Next ➡️</button>
+    <div id="result" role="status" aria-live="polite"></div>
+    <button class="main" id="restart" type="button" hidden>🔄 Try Again</button>
+    <p class="small">Made for English learners 💜</p>
+  </main>
+
+  <script>
+    "use strict";
+
+    const questions = [
+      { q: "1. Where is Día de Muertos celebrated?", options: ["Mexico", "China", "The United States"], answer: 0 },
+      { q: "2. What do people often make for Día de Muertos?", options: ["Snowmen", "Altars", "Sandcastles"], answer: 1 },
+      { q: "3. What is a popular Halloween symbol?", options: ["A pumpkin", "A watermelon", "A pineapple"], answer: 0 },
+      { q: "4. What do children often say on Halloween?", options: ["Good morning!", "Trick or treat!", "Happy birthday!"], answer: 1 },
+      { q: "5. Which country celebrates Qingming Festival?", options: ["China", "Mexico", "Canada"], answer: 0 },
+      { q: "6. What do families do during Qingming Festival?", options: ["Remember their ancestors", "Build snowmen", "Have a costume contest"], answer: 0 },
+      { q: "7. Which celebration often uses costumes?", options: ["Halloween", "Qingming Festival only", "None of them"], answer: 0 },
+      { q: "8. What do people remember on Día de Muertos?", options: ["Their favorite teachers", "Loved ones who have died", "Famous athletes"], answer: 1 },
+      { q: "9. What do these traditions have in common?", options: ["They are all sports", "They connect with remembrance or the dead", "They are all in winter"], answer: 1 },
+      { q: "10. Which celebration is strongly associated with orange and black decorations?", options: ["Halloween", "Día de Muertos only", "Qingming Festival"], answer: 0 }
+    ];
+
+    let current = 0;
+    let answers = Array(questions.length).fill(null);
+
+    const quizEl = document.getElementById("quiz");
+    const counterEl = document.getElementById("counter");
+    const barEl = document.getElementById("bar");
+    const progressEl = document.getElementById("progress");
+    const nextBtn = document.getElementById("next");
+    const restartBtn = document.getElementById("restart");
+    const resultEl = document.getElementById("result");
+    const feedbackEl = document.getElementById("feedback");
+
+    function updateProgress() {
+      const completed = answers.filter(answer => answer !== null).length;
+      barEl.style.width = `${(completed / questions.length) * 100}%`;
+      progressEl.setAttribute("aria-valuenow", String(completed));
+    }
+
+    function renderQuestion() {
+      const item = questions[current];
+      counterEl.textContent = `Question ${current + 1} of ${questions.length}`;
+      quizEl.replaceChildren();
+
+      const card = document.createElement("div");
+      card.className = "question";
+      const heading = document.createElement("h2");
+      heading.textContent = item.q;
+      card.appendChild(heading);
+
+      item.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "option" + (answers[current] === index ? " selected" : "");
+        button.setAttribute("aria-pressed", String(answers[current] === index));
+        button.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+        button.addEventListener("click", () => chooseAnswer(index));
+        card.appendChild(button);
+      });
+
+      quizEl.appendChild(card);
+      nextBtn.textContent = current === questions.length - 1 ? "See My Score ⭐" : "Next ➡️";
+      feedbackEl.textContent = answers[current] === null ? "Choose one answer to continue." : "Answer selected.";
+      updateProgress();
+    }
+
+    function chooseAnswer(index) {
+      answers[current] = index;
+      renderQuestion();
+    }
+
+    function nextQuestion() {
+      if (answers[current] === null) {
+        feedbackEl.textContent = "Please choose an answer first! 😊";
+        return;
+      }
+      if (current < questions.length - 1) {
+        current++;
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      const score = answers.reduce((total, answer, index) =>
+        total + (answer === questions[index].answer ? 1 : 0), 0);
+
+      quizEl.replaceChildren();
+      counterEl.textContent = "Quiz completed!";
+      barEl.style.width = "100%";
+      progressEl.setAttribute("aria-valuenow", String(questions.length));
+      nextBtn.hidden = true;
+      restartBtn.hidden = false;
+      feedbackEl.textContent = "";
+
+      const message = score >= 8 ? "Excellent! 🎉" :
+                      score >= 6 ? "Good job! 🌟" : "Keep practicing! 💪";
+      resultEl.textContent = `${message} You got ${score} out of ${questions.length} correct!`;
+    }
+
+    function restartQuiz() {
+      current = 0;
+      answers = Array(questions.length).fill(null);
+      nextBtn.hidden = false;
+      restartBtn.hidden = true;
+      resultEl.textContent = "";
+      renderQuestion();
+    }
+
+    nextBtn.addEventListener("click", nextQuestion);
+    restartBtn.addEventListener("click", restartQuiz);
+    renderQuestion();
+  </script>
+</body>
+</html>
